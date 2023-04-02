@@ -2,10 +2,25 @@
 
 The Push Notifications API provides access to native push notifications.
 
+## Freegle
+
+The repository is a copy/fork of the push-notifications section of the https://github.com/ionic-team/capacitor-plugins repo.
+
+@freegle/capacitor-push-notifications has changes for Android as follows:
+* Data-only notifications are handled, generating notifications when in the background and when not running
+* Tapping on these notifications starts the app
+
+Various aspects are currently hard-wired:
+* `packageName` in `MessagingService`
+* The title comes from data `title` field
+* The notification id comes from data `notId` field
+* Notication color to Color.GREEN
+* The notification large icon is set from `applicationInfo.icon`
+
 ## Install
 
 ```bash
-npm install @capacitor/push-notifications
+npm install https://github.com/Freegle/capacitor-push-notifications.git
 npx cap sync
 ```
 

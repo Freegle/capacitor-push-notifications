@@ -1,7 +1,7 @@
 {
   "name": "@freegle/capacitor-push-notifications",
   "version": "4.1.2",
-  "description": "The Push Notifications API provides access to native push notifications.",
+  "description": "The Push Notifications API provides access to native push notifications, updated for Freegle.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -13,14 +13,11 @@
     "ios/Plugin/",
     "CapacitorPushNotifications.podspec"
   ],
-  "author": "Ionic <hi@ionicframework.com>",
+  "author": "Freegle Geeks <geeks@ilovefreegle.org>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ionic-team/capacitor-plugins.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ionic-team/capacitor-plugins/issues"
+    "url": "git+https://github.com/Freegle/capacitor-push-notifications.git" 
   },
   "keywords": [
     "capacitor",

@@ -253,26 +253,17 @@ public class PushNotificationsPlugin extends Plugin {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), res, intent, PendingIntent.FLAG_IMMUTABLE);
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(
+            Notification.Builder builder = new Notification.Builder(
                 getContext(),
                 NotificationChannelManager.FOREGROUND_NOTIFICATION_CHANNEL_ID
             )
                 .setSmallIcon(pushIcon)
                 .setContentTitle(title)
                 .setContentText("")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(Notification.PRIORITY_DEFAULT)
                 .setColor(Color.GREEN)
                 .setContentIntent(pendingIntent);
-
-            if(r != null && appIconResId != 0){
-              Drawable d = ResourcesCompat.getDrawable(r, appIconResId, null);
-              if( d!=null) {
-                Bitmap b = getBitmapFromDrawable(d);
-                if( b!=null) {
-                  builder.setLargeIcon(b);
-                }
-              }
-            }
+            setLargeIcon(builder,r,appIconResId);
 
             notificationManager.notify(0, builder.build());
           }
@@ -337,11 +328,16 @@ public class PushNotificationsPlugin extends Plugin {
         return null;
     }
 
-    private static Bitmap getBitmapFromDrawable(Drawable drawable) {
-        final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        final Canvas canvas = new Canvas(bmp);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bmp;
+    public static void setLargeIcon(Notification.Builder builder, Resources r, int appIconResId) {
+        if (r != null && appIconResId != 0){
+          Drawable d = ResourcesCompat.getDrawable(r, appIconResId, null);
+          if( d != null) {
+            final Bitmap bmp = Bitmap.createBitmap(d.getIntrinsicWidth(), d.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            final Canvas canvas = new Canvas(bmp);
+            d.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            d.draw(canvas);
+            builder.setLargeIcon(bmp);
+          }
+        }
     }
 }
