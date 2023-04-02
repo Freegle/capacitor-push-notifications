@@ -14,7 +14,7 @@ Various aspects are currently hard-wired:
 * `packageName` in `MessagingService`
 * The title comes from data `title` field
 * The notification id comes from data `notId` field
-* Notication color to Color.GREEN
+* Notification color to Color.GREEN
 * The notification large icon is set from `applicationInfo.icon`
 
 ## Install
