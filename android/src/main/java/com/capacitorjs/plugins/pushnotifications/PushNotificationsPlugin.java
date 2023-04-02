@@ -22,6 +22,16 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.PendingIntent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
+import androidx.core.content.res.ResourcesCompat;
+import java.util.Map;
+
 @CapacitorPlugin(name = "PushNotifications", permissions = @Permission(strings = {}, alias = "receive"))
 public class PushNotificationsPlugin extends Plugin {
 
@@ -193,12 +203,14 @@ public class PushNotificationsPlugin extends Plugin {
         }
     }
 
-    public static void sendRemoteMessage(RemoteMessage remoteMessage) {
+    public static boolean sendRemoteMessage(RemoteMessage remoteMessage) {
         PushNotificationsPlugin pushPlugin = PushNotificationsPlugin.getPushNotificationsInstance();
         if (pushPlugin != null) {
             pushPlugin.fireNotification(remoteMessage);
+            return true;  // Foreground or Background
         } else {
             lastMessage = remoteMessage;
+            return false; // Not running
         }
     }
 
@@ -212,6 +224,62 @@ public class PushNotificationsPlugin extends Plugin {
             data.put(key, value);
         }
         remoteMessageData.put("data", data);
+
+        // Handle data notification
+        Map<String, String> msgdata = remoteMessage.getData();
+        if (msgdata != null) {
+          try{
+            String title = msgdata.get("title").toString();
+            int res = Integer.parseInt(msgdata.get("notId").toString());
+            Bundle bundle = null;
+            Resources r = null;
+            String className = getContext().getPackageName();
+            int appIconResId = 0;
+            try {
+                ApplicationInfo applicationInfo = getContext()
+                    .getPackageManager()
+                    .getApplicationInfo(className, PackageManager.GET_META_DATA);
+                bundle = applicationInfo.metaData;
+                r = getContext().getPackageManager().getResourcesForApplication(className);
+                appIconResId = applicationInfo.icon;
+            } catch (PackageManager.NameNotFoundException e) {
+            }
+            int pushIcon = android.R.drawable.ic_dialog_info;
+            if (bundle != null && bundle.getInt("com.google.firebase.messaging.default_notification_icon") != 0) {
+                pushIcon = bundle.getInt("com.google.firebase.messaging.default_notification_icon");
+            }
+
+            Intent intent = new Intent(getContext(), Class.forName(className+".MainActivity"));
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), res, intent, PendingIntent.FLAG_IMMUTABLE);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                getContext(),
+                NotificationChannelManager.FOREGROUND_NOTIFICATION_CHANNEL_ID
+            )
+                .setSmallIcon(pushIcon)
+                .setContentTitle(title)
+                .setContentText("")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setColor(Color.GREEN)
+                .setContentIntent(pendingIntent);
+
+            if(r != null && appIconResId != 0){
+              Drawable d = ResourcesCompat.getDrawable(r, appIconResId, null);
+              if( d!=null) {
+                Bitmap b = getBitmapFromDrawable(d);
+                if( b!=null) {
+                  builder.setLargeIcon(b);
+                }
+              }
+            }
+
+            notificationManager.notify(0, builder.build());
+          }
+          catch(Exception e) {
+            Log.e("PushNotifications", "fireNotification exception "+e.getMessage());
+          }
+        }
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
         if (notification != null) {
@@ -267,5 +335,13 @@ public class PushNotificationsPlugin extends Plugin {
             return (PushNotificationsPlugin) handle.getInstance();
         }
         return null;
+    }
+
+    private static Bitmap getBitmapFromDrawable(Drawable drawable) {
+        final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(bmp);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bmp;
     }
 }
