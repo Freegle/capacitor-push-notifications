@@ -230,42 +230,48 @@ public class PushNotificationsPlugin extends Plugin {
         if (msgdata != null) {
           try{
             String title = msgdata.get("title").toString();
+            String message = msgdata.get("message").toString();
+            int count = Integer.parseInt(msgdata.get("count").toString());
             int res = Integer.parseInt(msgdata.get("notId").toString());
-            Bundle bundle = null;
-            Resources r = null;
-            String className = getContext().getPackageName();
-            int appIconResId = 0;
-            try {
-                ApplicationInfo applicationInfo = getContext()
-                    .getPackageManager()
-                    .getApplicationInfo(className, PackageManager.GET_META_DATA);
-                bundle = applicationInfo.metaData;
-                r = getContext().getPackageManager().getResourcesForApplication(className);
-                appIconResId = applicationInfo.icon;
-            } catch (PackageManager.NameNotFoundException e) {
+            if( count==0){
+              notificationManager.cancelAll();
+            } else {
+              Bundle bundle = null;
+              Resources r = null;
+              String className = getContext().getPackageName();
+              int appIconResId = 0;
+              try {
+                  ApplicationInfo applicationInfo = getContext()
+                      .getPackageManager()
+                      .getApplicationInfo(className, PackageManager.GET_META_DATA);
+                  bundle = applicationInfo.metaData;
+                  r = getContext().getPackageManager().getResourcesForApplication(className);
+                  appIconResId = applicationInfo.icon;
+              } catch (PackageManager.NameNotFoundException e) {
+              }
+              int pushIcon = android.R.drawable.ic_dialog_info;
+              if (bundle != null && bundle.getInt("com.google.firebase.messaging.default_notification_icon") != 0) {
+                  pushIcon = bundle.getInt("com.google.firebase.messaging.default_notification_icon");
+              }
+
+              Intent intent = new Intent(getContext(), Class.forName(className+".MainActivity"));
+              intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+              PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), res, intent, PendingIntent.FLAG_IMMUTABLE);
+
+              Notification.Builder builder = new Notification.Builder(
+                  getContext(),
+                  NotificationChannelManager.FOREGROUND_NOTIFICATION_CHANNEL_ID
+              )
+                  .setSmallIcon(pushIcon)
+                  .setContentTitle(title)
+                  .setContentText(message)
+                  .setPriority(Notification.PRIORITY_DEFAULT)
+                  .setColor(Color.GREEN)
+                  .setContentIntent(pendingIntent);
+              setLargeIcon(builder,r,appIconResId);
+
+              notificationManager.notify(0, builder.build());
             }
-            int pushIcon = android.R.drawable.ic_dialog_info;
-            if (bundle != null && bundle.getInt("com.google.firebase.messaging.default_notification_icon") != 0) {
-                pushIcon = bundle.getInt("com.google.firebase.messaging.default_notification_icon");
-            }
-
-            Intent intent = new Intent(getContext(), Class.forName(className+".MainActivity"));
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), res, intent, PendingIntent.FLAG_IMMUTABLE);
-
-            Notification.Builder builder = new Notification.Builder(
-                getContext(),
-                NotificationChannelManager.FOREGROUND_NOTIFICATION_CHANNEL_ID
-            )
-                .setSmallIcon(pushIcon)
-                .setContentTitle(title)
-                .setContentText("")
-                .setPriority(Notification.PRIORITY_DEFAULT)
-                .setColor(Color.GREEN)
-                .setContentIntent(pendingIntent);
-            setLargeIcon(builder,r,appIconResId);
-
-            notificationManager.notify(0, builder.build());
           }
           catch(Exception e) {
             Log.e("PushNotifications", "fireNotification exception "+e.getMessage());

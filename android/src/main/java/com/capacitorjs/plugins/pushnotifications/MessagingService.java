@@ -42,9 +42,16 @@ public class MessagingService extends FirebaseMessagingService {
       if (msgdata == null) return;
 
       String title = msgdata.get("title").toString();
+      String message = msgdata.get("message").toString();
+      int count = Integer.parseInt(msgdata.get("count").toString());
       int notId = Integer.parseInt(msgdata.get("notId").toString());
 
       try{
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if( count==0){
+          notificationManager.cancelAll();
+          return;
+        }
         Intent intent = new Intent(this, Class.forName(packageName+".MainActivity"));
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, notId, intent, PendingIntent.FLAG_IMMUTABLE);
@@ -67,14 +74,13 @@ public class MessagingService extends FirebaseMessagingService {
         Notification.Builder builder =
                 new Notification.Builder(this, channelId)
                         .setContentTitle(title)
-                        //.setContentText("")
+                        .setContentText(message)
                         .setSmallIcon(pushIcon)
                         .setPriority(Notification.PRIORITY_DEFAULT)
                         .setAutoCancel(true)
                         .setColor(Color.GREEN)
                         .setContentIntent(pendingIntent);
         PushNotificationsPlugin.setLargeIcon(builder,r,appIconResId);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notId, builder.build());
       } catch (Exception e) {
         Log.e("PushNotifications", "sendServiceNotification exception "+e.getMessage());
