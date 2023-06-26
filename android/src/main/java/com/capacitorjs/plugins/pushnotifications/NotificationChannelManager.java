@@ -154,7 +154,7 @@ public class NotificationChannelManager {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 CharSequence name = "Push Notifications Foreground";
                 String description = "Push notifications in foreground";
-                int importance = NotificationManager.IMPORTANCE_HIGH;
+                int importance = NotificationManager.IMPORTANCE_DEFAULT; // Change from IMPORTANCE_HIGH so Do Not Disturb respected
                 NotificationChannel channel = new NotificationChannel(FOREGROUND_NOTIFICATION_CHANNEL_ID, name, importance);
                 channel.setDescription(description);
                 if (Arrays.asList(presentation).contains("sound")) {
