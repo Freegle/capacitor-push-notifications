@@ -50,7 +50,7 @@ public class PushNotificationsPlugin extends Plugin {
 
         staticBridge = this.bridge;
         if (lastMessage != null) {
-            fireNotification(lastMessage);
+            fireNotification(lastMessage, false);
             lastMessage = null;
         }
 
@@ -206,7 +206,7 @@ public class PushNotificationsPlugin extends Plugin {
     public static boolean sendRemoteMessage(RemoteMessage remoteMessage) {
         PushNotificationsPlugin pushPlugin = PushNotificationsPlugin.getPushNotificationsInstance();
         if (pushPlugin != null) {
-            pushPlugin.fireNotification(remoteMessage);
+            pushPlugin.fireNotification(remoteMessage, true);
             return true;  // Foreground or Background
         } else {
             lastMessage = remoteMessage;
@@ -214,7 +214,7 @@ public class PushNotificationsPlugin extends Plugin {
         }
     }
 
-    public void fireNotification(RemoteMessage remoteMessage) {
+    public void fireNotification(RemoteMessage remoteMessage, Boolean foreground) {
         JSObject remoteMessageData = new JSObject();
 
         JSObject data = new JSObject();
@@ -223,6 +223,7 @@ public class PushNotificationsPlugin extends Plugin {
             Object value = remoteMessage.getData().get(key);
             data.put(key, value);
         }
+        data.put("foreground", foreground);
         remoteMessageData.put("data", data);
 
         // Handle data notification
