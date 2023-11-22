@@ -251,7 +251,7 @@ public class PushNotificationsPlugin extends Plugin {
         }
     }
 
-    public void fireNotification(RemoteMessage remoteMessage) {
+    public void fireNotification(RemoteMessage remoteMessage, Boolean foreground) { // Freegle
         JSObject remoteMessageData = new JSObject();
 
         JSObject data = new JSObject();
