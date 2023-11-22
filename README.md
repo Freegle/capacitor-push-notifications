@@ -2,10 +2,25 @@
 
 The Push Notifications API provides access to native push notifications.
 
+## Freegle
+
+The repository is a copy/fork of the push-notifications section of the https://github.com/ionic-team/capacitor-plugins repo, version 5.1.0.
+
+@freegle/capacitor-push-notifications has changes for Android as follows:
+* Data-only notifications are handled, generating notifications when in the background and when not running
+* Tapping on these notifications starts the app
+
+Various aspects are currently hard-wired:
+* `packageName` in `MessagingService`
+* The title comes from data `title` field
+* The notification id comes from data `notId` field
+* Notification color to Color.GREEN
+* The notification large icon is set from `applicationInfo.icon`
+
 ## Install
 
 ```bash
-npm install @capacitor/push-notifications
+npm install https://github.com/Freegle/capacitor-push-notifications.git
 npx cap sync
 ```
 
@@ -29,13 +44,11 @@ func application(_ application: UIApplication, didFailToRegisterForRemoteNotific
 
 The Push Notification API uses [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging) SDK for handling notifications.  See [Set up a Firebase Cloud Messaging client app on Android](https://firebase.google.com/docs/cloud-messaging/android/client) and follow the instructions for creating a Firebase project and registering your application.  There is no need to add the Firebase SDK to your app or edit your app manifest - the Push Notifications provides that for you.  All that is required is your Firebase project's `google-services.json` file added to the module (app-level) directory of your app.
 
-Android 13 requires a permission check in order to receive push notifications.  You are required to call `checkPermissions()` and `requestPermissions()` accordingly, when targeting SDK 33.
-
 ### Variables
 
 This plugin will use the following project variables (defined in your app's `variables.gradle` file):
 
-- `firebaseMessagingVersion` version of `com.google.firebase:firebase-messaging` (default: `23.1.2`)
+- `$firebaseMessagingVersion` version of `com.google.firebase:firebase-messaging` (default: `23.0.5`)
 
 ---
 
@@ -50,27 +63,6 @@ On Android, the Push Notifications icon with the appropriate name should be adde
 If no icon is specified Android will use the application icon, but push icon should be white pixels on a transparent backdrop. As the application icon is not usually like that, it will show a white square or circle. So it's recommended to provide the separate icon for Push Notifications.
 
 Android Studio has an icon generator you can use to create your Push Notifications icon.
-
-## Push Notification channel
-
-From Android 8.0 (API level 26) and higher, notification channels are supported and recommended. The SDK will derive the `channelId` for incoming push notifications in the following order:
-
-1. **Firstly it will check if the incoming notification has a `channelId` set.**
-   When sending a push notification from either the FCM dashboard, or through their API, it's possible to specify a `channelId`.
-2. **Then it will check for a possible given value in the `AndroidManifest.xml`.**
-   If you prefer to create and use your own default channel, set `default_notification_channel_id` to the ID of your notification channel object as shown; FCM will use this value whenever incoming messages do not explicitly set a notification channel.
-
-```xml
-<meta-data
-    android:name="com.google.firebase.messaging.default_notification_channel_id"
-    android:value="@string/default_notification_channel_id" />
-```
-
-3. **Lastly it will use the fallback `channelId` that the Firebase SDK provides for us.**
-   FCM provides a default notification channel with basic settings out of the box. This channel will be created by the Firebase SDK upon receiving the first push message.
-
-> **Warning**
-> When using option 1 or 2, you are still required to create a notification channel in code with an ID that matches the one used the chosen option. You can use [`createChannel(...)`](#createchannel) for this. If you don't do this, the SDK will fallback to option 3.
 
 ## Push notifications appearance in foreground
 
@@ -180,7 +172,6 @@ const getDeliveredNotifications = async () => {
 <docgen-index>
 
 * [`register()`](#register)
-* [`unregister()`](#unregister)
 * [`getDeliveredNotifications()`](#getdeliverednotifications)
 * [`removeDeliveredNotifications(...)`](#removedeliverednotifications)
 * [`removeAllDeliveredNotifications()`](#removealldeliverednotifications)
@@ -215,21 +206,6 @@ This method will trigger the `'registration'` event with the push token or
 notification permissions, use `requestPermissions()` first.
 
 **Since:** 1.0.0
-
---------------------
-
-
-### unregister()
-
-```typescript
-unregister() => Promise<void>
-```
-
-Unregister the app from push notifications.
-
-This will delete a firebase token on Android, and unregister APNS on iOS.
-
-**Since:** 5.0.0
 
 --------------------
 
@@ -342,7 +318,7 @@ checkPermissions() => Promise<PermissionStatus>
 
 Check permission to receive push notifications.
 
-On Android 12 and below the status is always granted because you can always
+On Android the status is always granted because you can always
 receive push notifications. If you need to check if the user allows
 to display notifications, use local-notifications plugin.
 
@@ -361,7 +337,7 @@ requestPermissions() => Promise<PermissionStatus>
 
 Request permission to receive push notifications.
 
-On Android 12 and below it doesn't prompt for permission because you can always
+On Android it doesn't prompt for permission because you can always
 receive push notifications.
 
 On iOS, the first time you use the function, it will prompt the user

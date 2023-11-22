@@ -1,7 +1,7 @@
 {
-  "name": "@capacitor/push-notifications",
-  "version": "5.1.0",
-  "description": "The Push Notifications API provides access to native push notifications.",
+  "name": "@freegle/capacitor-push-notifications",
+  "version": "5.1.1",
+  "description": "The Push Notifications API provides access to native push notifications, updated for Freegle.",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -11,13 +11,13 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "CapacitorPushNotifications.podspec"
+    "FreegleCapacitorPushNotifications.podspec"
   ],
-  "author": "Ionic <hi@ionicframework.com>",
+  "author": "Freegle Geeks <geeks@ilovefreegle.org>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ionic-team/capacitor-plugins.git"
+    "url": "git+https://github.com/Freegle/capacitor-push-notifications.git"
   },
   "bugs": {
     "url": "https://github.com/ionic-team/capacitor-plugins/issues"
@@ -39,6 +39,7 @@
     "swiftlint": "node-swiftlint",
     "docgen": "docgen --api PushNotificationsPlugin --output-readme README.md --output-json dist/docs.json",
     "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
+    "build2": "npm run clean && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
