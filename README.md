@@ -17,6 +17,31 @@ Various aspects are currently hard-wired:
 * Notification color to Color.GREEN
 * The notification large icon is set from `applicationInfo.icon`
 
+Altered files:
+* android\src\main\java\com\capacitorjs\plugins\pushnotifications\MessagingService.java
+* android\src\main\java\com\capacitorjs\plugins\pushnotifications\PushNotificationsPlugin.java
+* android\src\main\java\com\capacitorjs\plugins\pushnotifications\NotificationChannelManager.java
+* CapacitorPushNotifications.podspec RENAMED TO FreegleCapacitorPushNotifications.podspec
+
+Some changes are hard-wired for Freegle.
+
+### MessagingService.java
+
+* If app not alive then send notification ie call `sendServiceNotification()`
+
+### PushNotificationsPlugin.java
+
+* `sendRemoteMessage()` return true if alive and so handled.
+* `fireNotification()` adds foreground data and handles data notifications including call to `setLargeIcon()`
+
+### NotificationChannelManager.java
+
+* Call `createForegroundNotificationChannel()` on start
+
+### FreegleCapacitorPushNotifications.podspec
+
+* iOS: File renamed and podspec name changed to reflect forked plugin name
+
 ## Install
 
 ```bash
